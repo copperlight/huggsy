@@ -1,0 +1,8 @@
+__pycache__/
+.coverage
+.idea/
+.pytest_cache/
+deployment-package.zip
+huggsy.egg-info/
+package/
+venv/

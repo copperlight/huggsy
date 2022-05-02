@@ -63,10 +63,10 @@ def skill_help(slack_event: dict) -> int:
     help_message = "".join([
         "Hi, I'm Huggsy, your penguin pal! ",
         "If you summon me by name, I know how to do a few tricks:\n\n",
-        " - 'help' - Display this message.\n",
-        " - 'tell me a joke' - My best attempt at Dad joke humor.\n",
-        " - 'wow' - What does the Owen say?\n",
-        " - 'skippy' - One of the things Skippy is no longer allowed to do.",
+        " - `help` - Display this message.\n",
+        " - `tell me a joke` - My best attempt at Dad joke humor.\n",
+        " - `wow` - What does the Owen say?\n",
+        " - `skippy` - One of the things Skippy is no longer allowed to do.",
     ])
     data = {
         "channel": slack_event.get("channel"),

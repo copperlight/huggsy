@@ -6,6 +6,7 @@ from typing import Optional
 import requests
 
 from app.evil_overlord import random_evil_overlord
+from app.jeff_dean import random_jeff_dean
 from app.skippys_list import random_skippy
 from app.slack_event import APP_MENTION, MESSAGE, SlackEvent
 
@@ -44,8 +45,14 @@ def lambda_handler(event: dict, context: object) -> dict:
     if slack_event.type in [APP_MENTION, MESSAGE]:
         if "help" in slack_event.text:
             status_code = {"statusCode": skill_help(slack_event)}
+        if "chuck norris" in slack_event.text:
+            status_code = {"statusCode": skill_chuck_norris(slack_event)}
         if "evil overlord" in slack_event.text:
             status_code = {"statusCode": skill_evil_overlord(slack_event)}
+        if "jeff dean" in slack_event.text:
+            status_code = {"statusCode": skill_jeff_dean(slack_event)}
+        if "seinfeld" in slack_event.text:
+            status_code = {"statusCode": skill_seinfeld(slack_event)}
         if "skippy" in slack_event.text:
             status_code = {"statusCode": skill_skippy(slack_event)}
         if "tell me a joke" in slack_event.text:
@@ -80,7 +87,10 @@ def skill_help(slack_event: SlackEvent) -> int:
         "Hi, I'm Huggsy, your penguin pal! ",
         "If you summon me by name, I know how to do a few tricks:\n\n",
         " - `help` - Display this message.\n",
-        " - `evil overlord` - One of top 100 things to do, if you became an Evil Overlord.\n",
+        " - `chuck norris` - Chuck Norris facts.\n",
+        " - `evil overlord` - One of the top 100 things to do, if you became an Evil Overlord.\n",
+        " - `jeff dean` - Jeff Dean facts.\n",
+        " - `seinfeld` - Seinfeld quotes.\n",
         " - `skippy` - One of the 213 things Skippy is no longer allowed to do in the US Army.\n",
         " - `tell me a joke` - My best attempt at Dad joke humor.\n",
         " - `wow` - What does the Owen say?\n",
@@ -92,7 +102,21 @@ def skill_help(slack_event: SlackEvent) -> int:
     return slack_post_message(data, slack_event.thread_ts)
 
 
+def skill_chuck_norris(slack_event: SlackEvent) -> int:
+    """Chuck Norris facts."""
+    r = requests.get("https://api.chucknorris.io/jokes/random")
+    if not r.ok:
+        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+        return r.status_code
+    data = {
+        "channel": slack_event.channel,
+        "text": r.json()["value"]
+    }
+    return slack_post_message(data, slack_event.thread_ts)
+
+
 def skill_evil_overlord(slack_event: SlackEvent) -> int:
+    """One of the Top 100 Things I'd Do, If I Ever Became An Evil Overlord."""
     data = {
         "channel": slack_event.channel,
         "text": random_evil_overlord()
@@ -100,7 +124,37 @@ def skill_evil_overlord(slack_event: SlackEvent) -> int:
     return slack_post_message(data, slack_event.thread_ts)
 
 
+def skill_jeff_dean(slack_event: SlackEvent) -> int:
+    """Jeff Dean facts."""
+    data = {
+        "channel": slack_event.channel,
+        "text": random_jeff_dean()
+    }
+    return slack_post_message(data, slack_event.thread_ts)
+
+
+def skill_seinfeld(slack_event: SlackEvent) -> int:
+    """Seinfeld quotes."""
+    r = requests.get("https://seinfeld-quotes.herokuapp.com/random")
+    if not r.ok:
+        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+        return r.status_code
+
+    seinfeld = r.json()
+    quote = seinfeld["quote"]
+    character = seinfeld["author"]
+    season = seinfeld["season"]
+    episode = seinfeld["episode"]
+
+    data = {
+        "channel": slack_event.channel,
+        "text": f"\"{quote}\" --{character}, S{season}E{episode}"
+    }
+    return slack_post_message(data, slack_event.thread_ts)
+
+
 def skill_skippy(slack_event: SlackEvent) -> int:
+    """One of 213 Things Skippy is No Longer Allowed to Do in the US Army."""
     data = {
         "channel": slack_event.channel,
         "text": random_skippy()
@@ -129,13 +183,13 @@ def skill_wow(slack_event: SlackEvent) -> int:
         return r.status_code
 
     random_wow = r.json()[0]
-    movie = random_wow['movie']
-    year = random_wow['year']
-    character = random_wow['character']
-    full_line = random_wow['full_line']
-    current_wow = random_wow['current_wow_in_movie']
-    total_wows = random_wow['total_wows_in_movie']
-    audio = random_wow['audio']
+    movie = random_wow["movie"]
+    year = random_wow["year"]
+    character = random_wow["character"]
+    full_line = random_wow["full_line"]
+    current_wow = random_wow["current_wow_in_movie"]
+    total_wows = random_wow["total_wows_in_movie"]
+    audio = random_wow["audio"]
 
     # pylint: disable=line-too-long
     data = {

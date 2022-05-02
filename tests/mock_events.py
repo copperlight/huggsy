@@ -32,28 +32,40 @@ SLACK_BASE_EVENT = {
     'isBase64Encoded': False
 }
 
-SLACK_CHALLENGE_EVENT = copy.deepcopy(SLACK_BASE_EVENT)
-SLACK_CHALLENGE_EVENT_BODY = {"challenge": "challenge_response"}
-SLACK_CHALLENGE_EVENT['body'] = json.dumps(SLACK_CHALLENGE_EVENT_BODY)
-
-SLACK_MESSAGE_EVENT = copy.deepcopy(SLACK_BASE_EVENT)
-SLACK_MESSAGE_EVENT_BODY = {
-    "event": {
-        "type": "message",
-        "text": "tell me a joke",
-        "channel": "abc123",
-        "channel_type": "im"
-    }
-}
-SLACK_MESSAGE_EVENT['body'] = json.dumps(SLACK_MESSAGE_EVENT_BODY)
 
 SLACK_APP_MENTION_EVENT = copy.deepcopy(SLACK_BASE_EVENT)
 SLACK_APP_MENTION_EVENT_BODY = {
     "event": {
         "type": "app_mention",
         "text": "<@abc123> tell me a joke",
-        "user": "def456",
         "channel": "ghi789"
     }
 }
 SLACK_APP_MENTION_EVENT['body'] = json.dumps(SLACK_APP_MENTION_EVENT_BODY)
+
+
+SLACK_BOT_MESSAGE_EVENT = copy.deepcopy(SLACK_BASE_EVENT)
+SLACK_BOT_MESSAGE_EVENT_BODY = {
+    "event": {
+        "type": "message",
+        "text": "tell me a joke",
+        "channel": "abc123"
+    }
+}
+SLACK_BOT_MESSAGE_EVENT['body'] = json.dumps(SLACK_BOT_MESSAGE_EVENT_BODY)
+
+
+SLACK_CHALLENGE_EVENT = copy.deepcopy(SLACK_BASE_EVENT)
+SLACK_CHALLENGE_EVENT_BODY = {"challenge": "challenge_response"}
+SLACK_CHALLENGE_EVENT['body'] = json.dumps(SLACK_CHALLENGE_EVENT_BODY)
+
+
+SLACK_MESSAGE_EVENT = copy.deepcopy(SLACK_BASE_EVENT)
+SLACK_MESSAGE_EVENT_BODY = {
+    "event": {
+        "type": "message",
+        "text": "tell me a joke",
+        "channel": "abc123"
+    }
+}
+SLACK_MESSAGE_EVENT['body'] = json.dumps(SLACK_MESSAGE_EVENT_BODY)

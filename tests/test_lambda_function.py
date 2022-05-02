@@ -1,6 +1,7 @@
 import unittest
 
 from app.lambda_function import lambda_handler
+from .mock_events import SLACK_BOT_MESSAGE_EVENT
 from .mock_events import SLACK_CHALLENGE_EVENT
 from .mock_events import SLACK_MESSAGE_EVENT
 
@@ -20,3 +21,7 @@ class LambdaFunctionTest(unittest.TestCase):
     def test_skill_challenge_response(self):
         result = lambda_handler(SLACK_CHALLENGE_EVENT, {})
         self.assertEqual({"body": "challenge_response", "statusCode": 200}, result)
+
+    def test_bot_self_messages_ignored(self):
+        result = lambda_handler(SLACK_BOT_MESSAGE_EVENT, {})
+        self.assertEqual({"statusCode": 200}, result)

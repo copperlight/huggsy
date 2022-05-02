@@ -1,5 +1,7 @@
 import random
 
+# 213 Things Skippy is No Longer Allowed to Do in the US Army
+
 # pylint: disable=line-too-long
 SKIPPYS_LIST = [
     "1. Not allowed to watch Southpark when I’m supposed to be working.",

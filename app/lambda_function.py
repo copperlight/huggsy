@@ -5,6 +5,7 @@ from os import environ
 import requests
 
 from app.slack_event_type import APP_MENTION, MESSAGE
+from app.evil_overlord import random_evil_overlord
 from app.skippys_list import random_skippy
 
 logger = logging.getLogger()
@@ -42,6 +43,8 @@ def lambda_handler(event: dict, context: object) -> dict:
         lowercase_text = slack_event.get("text").lower()
         if "help" in lowercase_text:
             status_code = {"statusCode": skill_help(slack_event)}
+        if "evil overlord" in lowercase_text:
+            status_code = {"statusCode": skill_evil_overlord(slack_event)}
         if "skippy" in lowercase_text:
             status_code = {"statusCode": skill_skippy(slack_event)}
         if "tell me a joke" in lowercase_text:
@@ -64,13 +67,22 @@ def skill_help(slack_event: dict) -> int:
         "Hi, I'm Huggsy, your penguin pal! ",
         "If you summon me by name, I know how to do a few tricks:\n\n",
         " - `help` - Display this message.\n",
+        " - `evil overlord` - One of top 100 things to do, if you became an Evil Overlord.\n",
+        " - `skippy` - One of the 213 things Skippy is no longer allowed to do in the US Army.\n",
         " - `tell me a joke` - My best attempt at Dad joke humor.\n",
         " - `wow` - What does the Owen say?\n",
-        " - `skippy` - One of the things Skippy is no longer allowed to do.",
     ])
     data = {
         "channel": slack_event.get("channel"),
         "text": help_message
+    }
+    return slack_post_message(data)
+
+
+def skill_evil_overlord(slack_event: dict) -> int:
+    data = {
+        "channel": slack_event.get("channel"),
+        "text": random_evil_overlord()
     }
     return slack_post_message(data)
 

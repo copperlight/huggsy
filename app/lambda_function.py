@@ -43,10 +43,12 @@ def lambda_handler(event: dict, context: object) -> dict:
     status_code = {"statusCode": 404}
 
     if slack_event.type in [APP_MENTION, MESSAGE]:
-        if "help" in slack_event.text:
+        if "help" in slack_event.text or "tell me more" in slack_event.text:
             status_code = {"statusCode": skill_help(slack_event)}
         if "chuck norris" in slack_event.text:
             status_code = {"statusCode": skill_chuck_norris(slack_event)}
+        if "dad joke" in slack_event.text or "tell me a joke" in slack_event.text:
+            status_code = {"statusCode": skill_tell_me_a_joke(slack_event)}
         if "evil overlord" in slack_event.text:
             status_code = {"statusCode": skill_evil_overlord(slack_event)}
         if "jeff dean" in slack_event.text:
@@ -55,9 +57,7 @@ def lambda_handler(event: dict, context: object) -> dict:
             status_code = {"statusCode": skill_seinfeld(slack_event)}
         if "skippy" in slack_event.text:
             status_code = {"statusCode": skill_skippy(slack_event)}
-        if "tell me a joke" in slack_event.text:
-            status_code = {"statusCode": skill_tell_me_a_joke(slack_event)}
-        if "wow" in slack_event.text:
+        if "wow" in slack_event.text or "owen" in slack_event.text:
             status_code = {"statusCode": skill_wow(slack_event)}
 
     return status_code
@@ -86,14 +86,14 @@ def skill_help(slack_event: SlackEvent) -> int:
     help_message = "".join([
         "Hi, I'm Huggsy, your penguin pal! ",
         "If you summon me by name, I know how to do a few tricks:\n\n",
-        " - `help` - Display this message.\n",
-        " - `chuck norris` - Chuck Norris facts.\n",
-        " - `evil overlord` - One of the top 100 things to do, if you became an Evil Overlord.\n",
-        " - `jeff dean` - Jeff Dean facts.\n",
-        " - `seinfeld` - Seinfeld quotes.\n",
+        " - `help | tell me more` - Display this message.\n",
+        " - `chuck norris` - One Chuck Norris fact.\n",
+        " - `dad joke | tell me a joke` - My best attempt at Dad joke humor.\n",
+        " - `evil overlord` - One of the top 100 things to do, if you become an Evil Overlord.\n",
+        " - `jeff dean` - One Jeff Dean fact.\n",
+        " - `seinfeld` - One Seinfeld quote.\n",
         " - `skippy` - One of the 213 things Skippy is no longer allowed to do in the US Army.\n",
-        " - `tell me a joke` - My best attempt at Dad joke humor.\n",
-        " - `wow` - What does the Owen say?\n",
+        " - `wow | owen` - What does the Owen say?\n",
     ])
     data = {
         "channel": slack_event.channel,

@@ -38,9 +38,9 @@ def lambda_handler(event: dict, context: object) -> dict:
 
     if slack_event.bot_id is not None:
         # the bot posted a message to its messages tab - don't talk to yourself
-        return {"statusCode": 200}
+        return {"statusCode": 204}
 
-    status_code = {"statusCode": 404}
+    status_code = {"statusCode": 204}
 
     if slack_event.type in [APP_MENTION, MESSAGE]:
         if "help" in slack_event.text or "tell me more" in slack_event.text:

@@ -1,5 +1,5 @@
 ROOT := $(shell pwd)
-SYSTEM := $(shell uname -s)
+SYSTEM := $(shell uname)
 
 VENV := venv
 ACTIVATE := . $(VENV)/bin/activate;
@@ -43,6 +43,8 @@ ifeq ($(SYSTEM), Darwin)
 else
 	pytest --cov=app tests
 endif
+
+.coverage: test
 
 .PHONY: coverage
 coverage: .coverage

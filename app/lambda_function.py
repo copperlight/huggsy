@@ -42,10 +42,10 @@ def lambda_handler(event: dict, context: object) -> dict:
     if slack_event.type in [APP_MENTION, MESSAGE]:
         if "help" in slack_event.text or "tell me more" in slack_event.text:
             status_code = {"statusCode": skill_help(slack_event)}
+        if "cat" in slack_event.text:
+            status_code = {"statusCode": skill_cat(slack_event)}
         if "dad joke" in slack_event.text or "tell me a joke" in slack_event.text:
-            status_code = {"statusCode": skill_tell_me_a_joke(slack_event)}
-        if "seinfeld" in slack_event.text:
-            status_code = {"statusCode": skill_seinfeld(slack_event)}
+            status_code = {"statusCode": skill_dad_joke(slack_event)}
         if "wow" in slack_event.text or "owen" in slack_event.text:
             status_code = {"statusCode": skill_wow(slack_event)}
 
@@ -87,7 +87,6 @@ def skill_help(slack_event: SlackEvent) -> int:
         " - `help | tell me more` - Display this message.\n",
         " - `cat` - One cat gif.\n",
         " - `dad joke | tell me a joke` - My best attempt at Dad joke humor.\n",
-        " - `seinfeld` - One Seinfeld quote.\n",
         " - `wow | owen` - What does the Owen say?\n",
     ])
     data = {
@@ -116,27 +115,7 @@ def skill_cat(slack_event: SlackEvent) -> int:
     return slack_file_upload(data, slack_event.thread_ts)
 
 
-def skill_seinfeld(slack_event: SlackEvent) -> int:
-    """Seinfeld quotes."""
-    r = requests.get("https://seinfeld-quotes.herokuapp.com/random")
-    if not r.ok:
-        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
-        return r.status_code
-
-    seinfeld = r.json()
-    quote = seinfeld["quote"]
-    character = seinfeld["author"]
-    season = seinfeld["season"]
-    episode = seinfeld["episode"]
-
-    data = {
-        "channel": slack_event.channel,
-        "text": f"\"{quote}\" --{character}, S{season}E{episode}"
-    }
-    return slack_post_message(data, slack_event.thread_ts)
-
-
-def skill_tell_me_a_joke(slack_event: SlackEvent) -> int:
+def skill_dad_joke(slack_event: SlackEvent) -> int:
     """The bot might be funny. All Dad jokes, all the time."""
     r = requests.get("https://icanhazdadjoke.com", headers={"Accept": "application/json"})
     if not r.ok:

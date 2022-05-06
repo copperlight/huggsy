@@ -11,7 +11,7 @@ Hi, I'm Huggsy, your penguin pal! If you summon me by name, I know how to do a f
 Example:
 
 ```
-matthew.johnson:black_cat:  9:22 PM
+copperlight:black_cat:  9:22 PM
 @Huggsy dad joke
 
 HuggsyAPP  9:22 PM

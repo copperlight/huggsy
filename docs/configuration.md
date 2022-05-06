@@ -9,21 +9,28 @@ This provides an overview of the configuration steps necessary to get the chatbo
 * Attach an AWS API gateway to the function.
 * Validate the Slack API challenge.
 
+## Create a Slack App
+
+* Slack API > Your Apps > Create New App > From Scratch
+* App Name: Huggsy > Pick a workspace: $WORKSPACE > Create App
+* Settings > Display Information > Basic Information
+  * Display Information
+    * App name: Huggsy
+    * Short description: Your penguin pal!
+    * App icon & Preview: <upload image from docs>
+    * Background color: #2c2d30
+  * Save Changes
+
 ## Configure Slack App Details, Tabs, OAuth Scopes and Event Subscriptions
 
-* Details
-  * Slack API > $BOT > Settings > Basic Information > Display Information
-* Tabs
-    * Slack API > $BOT > Features > App Home > Show Tabs
-        * Messages Tab: Enabled
-        * Allow users to send Slash commands and messages from the messages tab: Enabled
-        * Requires Slack client restart.
 * OAuth Scopes
     * Slack API > $BOT > Features > OAuth & Permissions > Scopes > Bot Token Scopes
         * app_mentions:read
         * channels:join
         * chat:write
         * commands
+        * files:read
+        * files:write
         * im:history
         * im:read
         * im:write
@@ -31,10 +38,25 @@ This provides an overview of the configuration steps necessary to get the chatbo
         * links:write
         * reactions:read
         * reactions:write
-* Event Subscriptions
-    * Slack API > $BOT > Features > Event Subscriptions > Subscribe to bot events
-        * message.im
-        * app_mention
+* OAuth Tokens for Your Workspace
+  * Install to Workspace > Allow
+  * Bot User OAuth Token > Copy
+* Tabs
+    * Slack API > $BOT > Features > App Home
+      * Your App's Presence in Slack
+        * Always Show My Bot as Online
+      * Show Tabs
+          * Messages Tab: Enabled
+          * Allow users to send Slash commands and messages from the messages tab: Enabled
+          * Requires Slack client restart.
+* Slack API > $BOT > Features > Event Subscriptions
+  * Enable Events: Enabled
+     * Request URL: <AWS API Gateway URL>
+     * With the challenge response handling built-in, the URL will verify immediately.
+  * Subscribe to bot events
+    * app_mention
+    * message.im
+  * Save Changes
 * Reinstall App
   * Slack API > $BOT > Settings > Install App > Reinstall to Workspace
 

@@ -1,7 +1,7 @@
+import io
 import json
 import logging
 from os import environ
-from typing import Optional
 
 import requests
 
@@ -62,19 +62,25 @@ def make_slack_event(body_event: dict) -> SlackEvent:
     )
 
 
-def slack_post_message(data: dict, thread_ts: Optional[int]) -> int:
-    if thread_ts is not None:
-        data["thread_ts"] = thread_ts
+def slack_post_message(slack_event: SlackEvent, text: str) -> int:
+    data = {"channel": slack_event.channel, "text": text}
+    if slack_event.thread_ts is not None:
+        data["thread_ts"] = slack_event.thread_ts
+
     r = requests.post(f"{SLACK_BASE_URL}/chat.postMessage", headers=AUTHORIZATION, data=data)
     if not r.ok:
         logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
     return r.status_code
 
 
-def slack_file_upload(data: dict, thread_ts: Optional[int]) -> int:
-    if thread_ts is not None:
-        data["thread_ts"] = thread_ts
-    r = requests.post(f"{SLACK_BASE_URL}/files.upload", headers=AUTHORIZATION, data=data)
+def slack_file_upload(slack_event: SlackEvent, file: bytes, comment: str) -> int:
+    data = {"channels": slack_event.channel, "initial_comment": comment}
+    if slack_event.thread_ts is not None:
+        data["thread_ts"] = slack_event.thread_ts
+    files = {"file": io.BytesIO(file)}
+
+    # pylint: disable=line-too-long
+    r = requests.post(f"{SLACK_BASE_URL}/files.upload", headers=AUTHORIZATION, files=files, data=data)
     if not r.ok:
         logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
     return r.status_code
@@ -84,20 +90,23 @@ def skill_help(slack_event: SlackEvent) -> int:
     help_message = "".join([
         "Hi, I'm Huggsy, your penguin pal! ",
         "If you summon me by name, I know how to do a few tricks:\n\n",
-        " - `help | tell me more` - Display this message.\n",
-        " - `cat` - One cat gif.\n",
+        " - `help | tell me more` - Display this message. I can be helpful.\n",
+        " - `cat` - One cat image. Meow.\n",
         " - `dad joke | tell me a joke` - My best attempt at Dad joke humor.\n",
         " - `wow | owen` - What does the Owen say?\n",
     ])
-    data = {
-        "channel": slack_event.channel,
-        "text": help_message
-    }
-    return slack_post_message(data, slack_event.thread_ts)
+
+    return slack_post_message(slack_event, help_message)
 
 
 def skill_cat(slack_event: SlackEvent) -> int:
-    """Cat gifs."""
+    """Cat facts and images."""
+    r = requests.get("https://catfact.ninja/fact")
+    if not r.ok:
+        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+        return r.status_code
+    fact = r.json()["fact"]
+
     r = requests.get("https://api.thecatapi.com/v1/images/search")
     if not r.ok:
         logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
@@ -107,12 +116,9 @@ def skill_cat(slack_event: SlackEvent) -> int:
     if not r.ok:
         logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
         return r.status_code
+    image = r.content
 
-    data = {
-        "channel": slack_event.channel,
-        "file": r.content
-    }
-    return slack_file_upload(data, slack_event.thread_ts)
+    return slack_file_upload(slack_event, image, fact)
 
 
 def skill_dad_joke(slack_event: SlackEvent) -> int:
@@ -121,11 +127,9 @@ def skill_dad_joke(slack_event: SlackEvent) -> int:
     if not r.ok:
         logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
         return r.status_code
-    data = {
-        "channel": slack_event.channel,
-        "text": r.json()["joke"]
-    }
-    return slack_post_message(data, slack_event.thread_ts)
+    joke = r.json()["joke"]
+
+    return slack_post_message(slack_event, joke)
 
 
 def skill_wow(slack_event: SlackEvent) -> int:
@@ -145,8 +149,6 @@ def skill_wow(slack_event: SlackEvent) -> int:
     audio = random_wow["audio"]
 
     # pylint: disable=line-too-long
-    data = {
-        "channel": slack_event.channel,
-        "text": f"\"{full_line}\" --{character}, {movie}, {year} (wow {current_wow}/{total_wows})\n\n{audio}"
-    }
-    return slack_post_message(data, slack_event.thread_ts)
+    wow = f"\"{full_line}\" --{character}, {movie}, {year} (wow {current_wow}/{total_wows})\n\n{audio}"
+
+    return slack_post_message(slack_event, wow)

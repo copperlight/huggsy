@@ -69,14 +69,20 @@ def is_bot_response(slack_event: SlackEvent) -> bool:
     return False
 
 
+def log_http_error(r: requests.models.Response) -> bool:
+    if not r.ok:
+        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+        return True
+    return False
+
+
 def slack_post_message(slack_event: SlackEvent, text: str) -> int:
     data = {"channel": slack_event.channel, "text": text}
     if slack_event.thread_ts is not None:
         data["thread_ts"] = slack_event.thread_ts
 
     r = requests.post(f"{SLACK_BASE_URL}/chat.postMessage", headers=AUTHORIZATION, data=data)
-    if not r.ok:
-        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+    log_http_error(r)
     return r.status_code
 
 
@@ -88,8 +94,7 @@ def slack_file_upload(slack_event: SlackEvent, file: bytes, comment: str) -> int
 
     # pylint: disable=line-too-long
     r = requests.post(f"{SLACK_BASE_URL}/files.upload", headers=AUTHORIZATION, files=files, data=data)
-    if not r.ok:
-        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+    log_http_error(r)
     return r.status_code
 
 
@@ -109,19 +114,17 @@ def skill_help(slack_event: SlackEvent) -> int:
 def skill_cat(slack_event: SlackEvent) -> int:
     """Cat facts and images."""
     r = requests.get("https://catfact.ninja/fact")
-    if not r.ok:
-        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+    if log_http_error(r):
         return r.status_code
     fact = r.json()["fact"]
 
     r = requests.get("https://api.thecatapi.com/v1/images/search")
-    if not r.ok:
-        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+    if log_http_error(r):
         return r.status_code
+    image_url = r.json()[0]["url"]
 
-    r = requests.get(r.json()[0]["url"])
-    if not r.ok:
-        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+    r = requests.get(image_url)
+    if log_http_error(r):
         return r.status_code
     image = r.content
 
@@ -131,8 +134,7 @@ def skill_cat(slack_event: SlackEvent) -> int:
 def skill_dad_joke(slack_event: SlackEvent) -> int:
     """The bot might be funny. All Dad jokes, all the time."""
     r = requests.get("https://icanhazdadjoke.com", headers={"Accept": "application/json"})
-    if not r.ok:
-        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+    if log_http_error(r):
         return r.status_code
     joke = r.json()["joke"]
 
@@ -142,8 +144,7 @@ def skill_dad_joke(slack_event: SlackEvent) -> int:
 def skill_wow(slack_event: SlackEvent) -> int:
     """Owen says Wow!"""
     r = requests.get("https://owen-wilson-wow-api.herokuapp.com/wows/random")
-    if not r.ok:
-        logger.error("http request failed: status_code=%s text=%s", r.status_code, r.text)
+    if log_http_error(r):
         return r.status_code
 
     random_wow = r.json()[0]

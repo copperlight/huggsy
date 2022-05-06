@@ -5,6 +5,7 @@ from os import environ
 
 import requests
 
+from app.dice import roll_dice
 from app.slack_event import APP_MENTION, MESSAGE, SlackEvent
 
 logger = logging.getLogger()
@@ -46,6 +47,8 @@ def lambda_handler(event: dict, context: object) -> dict:
             status_code = {"statusCode": skill_cat(slack_event)}
         if "dad joke" in slack_event.text or "tell me a joke" in slack_event.text:
             status_code = {"statusCode": skill_dad_joke(slack_event)}
+        if "roll" in slack_event.text:
+            status_code = {"statusCode": skill_roll_dice(slack_event)}
         if "wow" in slack_event.text or "owen" in slack_event.text:
             status_code = {"statusCode": skill_wow(slack_event)}
 
@@ -105,6 +108,7 @@ def skill_help(slack_event: SlackEvent) -> int:
         " - `help | tell me more` - Display this message. I can be helpful.\n",
         " - `cat` - One cat image. Meow.\n",
         " - `dad joke | tell me a joke` - My best attempt at Dad joke humor.\n",
+        " - `roll` - Roll two dice."
         " - `wow | owen` - What does the Owen Wilson say?\n",
     ])
 
@@ -139,6 +143,11 @@ def skill_dad_joke(slack_event: SlackEvent) -> int:
     joke = r.json()["joke"]
 
     return slack_post_message(slack_event, joke)
+
+
+def skill_roll_dice(slack_event: SlackEvent) -> int:
+    """Can the bot gamble? Maybe not. Not quite tabletop ready."""
+    return slack_post_message(slack_event, roll_dice())
 
 
 def skill_wow(slack_event: SlackEvent) -> int:

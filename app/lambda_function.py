@@ -106,9 +106,9 @@ def skill_help(slack_event: SlackEvent) -> int:
         "Hi, I'm Huggsy, your penguin pal! ",
         "If you summon me by name, I know how to do a few tricks:\n\n",
         " - `help | tell me more` - Display this message. I can be helpful.\n",
-        " - `cat` - One cat image. Meow.\n",
+        " - `cat` - One cat fact, one cat image. Meow.\n",
         " - `dad joke | tell me a joke` - My best attempt at Dad joke humor.\n",
-        " - `roll` - Roll two dice.\n",
+        " - `roll` - Roll two dice. Are we Vegas yet?\n",
         " - `wow | owen` - What does the Owen Wilson say?\n",
     ])
 

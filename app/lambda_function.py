@@ -105,7 +105,7 @@ def skill_help(slack_event: SlackEvent) -> int:
         " - `help | tell me more` - Display this message. I can be helpful.\n",
         " - `cat` - One cat image. Meow.\n",
         " - `dad joke | tell me a joke` - My best attempt at Dad joke humor.\n",
-        " - `wow | owen` - What does the Owen say?\n",
+        " - `wow | owen` - What does the Owen Wilson say?\n",
     ])
 
     return slack_post_message(slack_event, help_message)

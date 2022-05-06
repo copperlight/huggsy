@@ -33,7 +33,7 @@ def lambda_handler(event: dict, context: object) -> dict:
     logger.info("body_event=%s", body_event)
     slack_event = make_slack_event(body_event)
 
-    if slack_event.bot_id is not None:
+    if is_bot_response(slack_event):
         # the bot posted a message to its messages tab - don't talk to yourself
         return {"statusCode": 204}
 
@@ -58,8 +58,15 @@ def make_slack_event(body_event: dict) -> SlackEvent:
         body_event.get("channel"),
         body_event.get("text").lower(),
         body_event.get("bot_id"),
+        body_event.get("display_as_bot"),
         body_event.get("thread_ts")
     )
+
+
+def is_bot_response(slack_event: SlackEvent) -> bool:
+    if slack_event.bot_id is not None or slack_event.display_as_bot is not None:
+        return True
+    return False
 
 
 def slack_post_message(slack_event: SlackEvent, text: str) -> int:

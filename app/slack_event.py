@@ -11,4 +11,5 @@ class SlackEvent:
     channel: str
     text: str
     bot_id: Optional[str]
+    display_as_bot: Optional[str]
     thread_ts: Optional[int]

@@ -3,7 +3,7 @@
 # huggsy
 
 Hi, I'm Huggsy, your penguin pal! If you summon me by name, I know how to do a few tricks:
- - help | tell me more` - Display this message. I can be helpful.
+ - `help | tell me more` - Display this message. I can be helpful.
  - `cat` - One cat image. Meow.
  - `dad joke | tell me a joke` - My best attempt at Dad joke humor.
  - `wow | owen` - What does the Owen say?
